@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useHistory } from "react-router";
 import RestaurantFinder from "../Api/RestaurantFinder";
 
 const UpdateRestaurant = (props) => {
   const { id } = useParams();
-  const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
-  const [priceRange, setPriceRange] = useState("Price Range");
+  const [Name, setName] = useState("");
+  const [Location, setLocation] = useState("");
+  const [PriceRange, setPriceRange] = useState("Price Range");
+  let history = useHistory();
   useEffect(() => {
     const fetchData = async () => {
-      const response = await RestaurantFinder.get(`/${id}`);
+      try {
+        const response = await RestaurantFinder.get(`/${id}`);
+        setName(response.data.data.restaurant[0].name);
+        setLocation(response.data.data.restaurant[0].location);
+        setPriceRange(response.data.data.restaurant[0].price_range);
+      } catch (error) {
+        console.error(error.message);
+      }
     };
     fetchData();
   }, [id]);
@@ -17,11 +25,12 @@ const UpdateRestaurant = (props) => {
     e.preventDefault();
     try {
       const response = await RestaurantFinder.put(`/${id}`, {
-        name,
-        location,
-        price_range: priceRange,
+        name: Name,
+        location: Location,
+        price_range: PriceRange,
       });
-      console.log(response.data.data.restaurant);
+      console.log(response.message);
+      history.push("/");
     } catch (error) {
       console.error(error.message);
     }
@@ -33,7 +42,7 @@ const UpdateRestaurant = (props) => {
           <div className='form-col'>
             <div className='form-group'>
               <input
-                value={name}
+                value={Name}
                 onChange={(e) => setName(e.target.value)}
                 type='text'
                 className='form-control'
@@ -42,7 +51,7 @@ const UpdateRestaurant = (props) => {
             </div>
             <div className='form-group'>
               <input
-                value={location}
+                value={Location}
                 onChange={(e) => setLocation(e.target.value)}
                 type='text'
                 className='form-control'
@@ -52,7 +61,7 @@ const UpdateRestaurant = (props) => {
             <div className='form-group'>
               <select
                 className='custom-select my-1 mr-sm-2'
-                value={priceRange}
+                value={PriceRange}
                 onChange={(e) => setPriceRange(e.target.value)}
               >
                 <option disabled>Price Range</option>
