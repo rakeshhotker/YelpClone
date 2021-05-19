@@ -100,6 +100,45 @@ app.delete("/api/v1/restaurants/:id", async (req, res) => {
     console.error(error.message);
   }
 });
+
+//add a review
+app.post("/api/v1/restaurants/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, review, rating } = req.body;
+    const response = await db.query(
+      "insert into reviews (restaurant_id,name,review,rating) values($1,$2,$3,$4) returning *",
+      [id, name, review, rating]
+    );
+    res.status(200).json({
+      status: "success",
+      data: {
+        reviews: response.rows,
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+//get all reviews
+app.get("/api/v1/restaurants/reviews/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await db.query(
+      "select * from reviews where restaurant_id=$1",
+      [id]
+    );
+    res.status(200).json({
+      status: "success",
+      responses: response.rows.length,
+      data: {
+        reviews: response.rows,
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Server listening on ${port}`);

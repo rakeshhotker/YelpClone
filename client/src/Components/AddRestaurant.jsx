@@ -18,7 +18,7 @@ const AddRestaurant = () => {
       setName("");
       setLocation("");
       setPriceRange("");
-      console.log(response);
+      console.log(response.status);
     } catch (error) {
       console.error(error.message);
     }
