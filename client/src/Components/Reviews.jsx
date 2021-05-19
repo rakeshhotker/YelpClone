@@ -1,30 +1,13 @@
-import React, { useContext, useEffect } from "react";
-import { useParams } from "react-router";
-import RestaurantFinder from "../Api/RestaurantFinder";
-import { RestaurantsContext } from "../context/RestaurantContext";
+import React from "react";
 import StarRating from "./StarRating";
 
-const Reviews = () => {
-  const { reviews, setReviews } = useContext(RestaurantsContext);
-  const { id } = useParams();
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await RestaurantFinder.get(`/reviews/${id}`);
-        console.log(response);
-        setReviews(response.data.data.reviews);
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-    fetchData();
-  }, [id, setReviews]);
+const Reviews = ({ reviews }) => {
   return (
-    <div>
+    <div className='row row-cols-3 mb-2'>
       {reviews &&
         reviews.map((review) => {
           return (
-            <div className='row row-cols-3 mb-2'>
+            <div key={review.id}>
               <div
                 className='card text-white bg-primary mb-3 mr-4'
                 style={{ maxWidth: "30" }}

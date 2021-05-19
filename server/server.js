@@ -17,12 +17,14 @@ app.use(cors());
 //get all restaurants
 app.get("/api/v1/restaurants", async (req, res) => {
   try {
-    const response = await db.query("select * from restaurants");
+    const restaurantRatingsData = await db.query(
+      "select * from restaurants left join (select restaurant_id, COUNT(*), TRUNC(AVG(rating),1) as average_rating from reviews group by restaurant_id) reviews on restaurants.id=reviews.restaurant_id"
+    );
     res.status(200).json({
       status: "success",
-      responses: response.rows.length,
+      responses: restaurantRatingsData.rows.length,
       data: {
-        restaurant: response.rows,
+        restaurant: restaurantRatingsData.rows,
       },
     });
   } catch (error) {
@@ -33,15 +35,21 @@ app.get("/api/v1/restaurants", async (req, res) => {
 app.get("/api/v1/restaurants/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const response = await db.query("select * from restaurants where id=$1", [
-      id,
-    ]);
+    const response = await db.query(
+      "select * from restaurants left join (select restaurant_id, COUNT(*), TRUNC(AVG(rating),1) as average_rating from reviews group by restaurant_id) reviews on restaurants.id=reviews.restaurant_id where id=$1",
+      [id]
+    );
+    const results = await db.query(
+      "select * from reviews where restaurant_id=$1",
+      [id]
+    );
     // console.log(req.params);
     res.status(200).json({
       status: "success",
       responses: response.rows.length,
       data: {
-        restaurant: response.rows,
+        restaurant: response.rows[0],
+        reviews: results.rows,
       },
     });
   } catch (error) {
@@ -112,25 +120,6 @@ app.post("/api/v1/restaurants/:id", async (req, res) => {
     );
     res.status(200).json({
       status: "success",
-      data: {
-        reviews: response.rows,
-      },
-    });
-  } catch (error) {
-    console.error(error.message);
-  }
-});
-//get all reviews
-app.get("/api/v1/restaurants/reviews/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const response = await db.query(
-      "select * from reviews where restaurant_id=$1",
-      [id]
-    );
-    res.status(200).json({
-      status: "success",
-      responses: response.rows.length,
       data: {
         reviews: response.rows,
       },

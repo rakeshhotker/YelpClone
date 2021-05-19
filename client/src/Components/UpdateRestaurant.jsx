@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router";
 import RestaurantFinder from "../Api/RestaurantFinder";
-
 const UpdateRestaurant = (props) => {
   const { id } = useParams();
   const [Name, setName] = useState("");
@@ -12,9 +11,9 @@ const UpdateRestaurant = (props) => {
     const fetchData = async () => {
       try {
         const response = await RestaurantFinder.get(`/${id}`);
-        setName(response.data.data.restaurant[0].name);
-        setLocation(response.data.data.restaurant[0].location);
-        setPriceRange(response.data.data.restaurant[0].price_range);
+        setName(response.data.data.restaurant.name);
+        setLocation(response.data.data.restaurant.location);
+        setPriceRange(response.data.data.restaurant.price_range);
       } catch (error) {
         console.error(error.message);
       }

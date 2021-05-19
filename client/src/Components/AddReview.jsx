@@ -1,14 +1,14 @@
-import React, { useContext, useState } from "react";
-import { useParams } from "react-router";
+import React, { useState } from "react";
+import { useParams, useLocation, useHistory } from "react-router";
 import RestaurantFinder from "../Api/RestaurantFinder";
-import { RestaurantsContext } from "../context/RestaurantContext";
 
 const AddReview = () => {
-  const { addReviews } = useContext(RestaurantsContext);
   const [name, setName] = useState("");
   const [reviewText, setReviewText] = useState("");
-  const [rating, setRating] = useState("");
+  const [rating, setRating] = useState("Rating");
   const { id } = useParams();
+  const location = useLocation();
+  const history = useHistory();
   const handleAddReview = async (e) => {
     e.preventDefault();
     try {
@@ -17,12 +17,8 @@ const AddReview = () => {
         review: reviewText,
         rating,
       });
-      console.log(response.data.data.reviews);
-      addReviews(response.data.data.reviews[0]);
-      console.log(response.status);
-      setName("");
-      setRating("");
-      setReviewText("");
+      history.push("/");
+      history.push(location.pathname);
     } catch (error) {
       console.error(error.message);
     }
